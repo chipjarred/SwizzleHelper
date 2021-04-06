@@ -11,6 +11,8 @@
 // objc_msgSendSuper2 is in runtime but not in objc/message.h
 OBJC_EXPORT id objc_msgSendSuper2(struct objc_super *super, SEL op, ...);
 
+#define USE_MSGSENDSUPER2 1
+
 /*
  All of the callIMP_... functions are implemented in Objective-C instead of
  Swift because I could not get Swift to properly cast them `IMP` to the correct
