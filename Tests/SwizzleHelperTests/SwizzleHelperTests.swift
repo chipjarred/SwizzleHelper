@@ -1,5 +1,6 @@
 import XCTest
 import SwizzleHelper
+import ObjectiveC
 
 final class SwizzleHelperTests: XCTestCase
 {
@@ -87,14 +88,15 @@ final class SwizzleHelperTests: XCTestCase
                 callReplacedMethod(for: #selector(Self.foo))
             }
         }
-
+        
         Swizzled.replaceMethod(
             #selector(Swizzled.foo),
             with: #selector(Swizzled.fooReplacement)
         )
         
         let swizzled = Swizzled { result += $0 }
-        swizzled.perform(#selector(Swizzled.foo))
+        
+        swizzled.perform(#selector(Unswizzled.foo))
         
         XCTAssertEqual(result, "SwizzledUnswizzled")
     }

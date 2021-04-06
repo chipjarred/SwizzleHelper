@@ -55,15 +55,28 @@ void callIMP_withPointer(
     ((funcPtr)imp)(receiver, selector, param);
 }
 
+#define USE_MSGSENDSUPER2 1
 // -------------------------------------
 id forwardToSuperFromSwizzle(
    _Nonnull __unsafe_unretained id receiver,
     SEL selector,
     va_list args)
 {
+    typedef id (*funcPtr)(struct objc_super *, SEL, va_list);
+    
     if (receiver == NULL) return NULL;
     if (selector == NULL) return NULL;
+
+#if USE_MSGSENDSUPER2
+    struct objc_super superInfo = {
+        .receiver = receiver,
+        .super_class = object_getClass(receiver)
+    };
     
+    OBJC_EXPORT id objc_msgSendSuper2(struct objc_super *super, SEL op, ...);
+
+    return ((funcPtr)objc_msgSendSuper2)(&superInfo, selector, args);
+#else
     typedef id (*funcPtr)(struct objc_super *, SEL, va_list);
     struct objc_super superInfo = {
         .receiver = receiver,
@@ -71,7 +84,9 @@ id forwardToSuperFromSwizzle(
     };
 
     return ((funcPtr)objc_msgSendSuper)(&superInfo, selector, args);
+#endif
 }
+
 
 // -------------------------------------
 BOOL addMethodThatCallsSuper(
