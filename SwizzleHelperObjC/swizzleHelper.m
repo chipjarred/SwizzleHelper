@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import "include/swizzleHelper.h"
 #import <objc/message.h>
 
