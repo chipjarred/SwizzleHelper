@@ -1,3 +1,8 @@
+#ifdef OBJC_OLD_DISPATCH_PROTOTYPES
+#undef OBJC_OLD_DISPATCH_PROTOTYPES
+#endif
+#define OBJC_OLD_DISPATCH_PROTOTYPES 0
+
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import "include/swizzleHelper.h"
