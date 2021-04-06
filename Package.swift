@@ -24,8 +24,10 @@ let package = Package(
             name: "SwizzleHelperObjC",
             dependencies: [],
             path: "SwizzleHelperObjC",
-            cSettings: [
-               .headerSearchPath("Internal"), 
+            cSettings:
+            [
+                .headerSearchPath("Internal"),
+                .unsafeFlags(["-Onone"]),
             ]
         ),
         .testTarget(
