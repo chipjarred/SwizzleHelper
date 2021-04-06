@@ -98,7 +98,10 @@ public extension NSObject
         selector: Selector,
         newImplementation: IMP) -> IMP?
     {
+        #if DEBUG
         print("Swizzling \(Self.self).\(selector)")
+        #endif
+        
         guard self.superclass() != nil else {
             fatalError("Swizzling NSObject itself - don't do that")
         }
