@@ -60,6 +60,7 @@ id forwardToSuperFromSwizzle(
     SEL selector,
     va_list args)
 {
+    if (receiver == NULL) return NULL;
     if (selector == NULL) return NULL;
     
     typedef id (*funcPtr)(struct objc_super *, SEL, va_list);
