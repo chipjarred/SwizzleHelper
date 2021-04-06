@@ -8,6 +8,10 @@
 #import "include/swizzleHelper.h"
 #import <objc/message.h>
 
+// objc_msgSendSuper2 is in runtime but not in objc/message.h
+OBJC_EXPORT id objc_msgSendSuper2(struct objc_super *super, SEL op, ...);
+
+
 /*
  All of the callIMP_... functions are implemented in Objective-C instead of
  Swift because I could not get Swift to properly cast them `IMP` to the correct
@@ -78,8 +82,6 @@ id forwardToSuperFromSwizzle(
         .super_class = object_getClass(receiver)
     };
     
-    OBJC_EXPORT id objc_msgSendSuper2(struct objc_super *super, SEL op, ...);
-
     return ((funcPtr)objc_msgSendSuper2)(&superInfo, selector, args);
 #else
     typedef id (*funcPtr)(struct objc_super *, SEL, va_list);
@@ -92,12 +94,55 @@ id forwardToSuperFromSwizzle(
 #endif
 }
 
+BOOL addMethodThatCallsSuper(
+    Class  _Nonnull __unsafe_unretained cls,
+    SEL _Nonnull selector,
+    const char* _Nullable types)
+{
+    typedef id (*funcPtr)(struct objc_super *, SEL, va_list);
+    class_addMethod(
+        cls,
+        selector,
+        imp_implementationWithBlock(
+            ^(__unsafe_unretained id self, va_list argp)
+            {
+#if USE_MSGSENDSUPER2
+                struct objc_super super = {self, cls};
+                return ((funcPtr)objc_msgSendSuper2)(&super, selector, argp);
+#else
+                struct objc_super super = {self, class_getSuperclass(cls)};
+                return ((funcPtr)objc_msgSendSuper)(&super, selector, argp);
+#endif
+            }
+        ),
+        types
+    );
+}
+
+static _Nullable IMP pspdf_swizzleSelector(Class clazz, SEL selector, IMP newImplementation) {
+    // If the method does not exist for this class, do nothing.
+    const Method method = class_getInstanceMethod(clazz, selector);
+    if (!method) {
+        // Cannot swizzle methods that are not implemented by the class or one of its parents.
+        return NULL;
+    }
+
+    // Make sure the class implements the method. If this is not the case, inject an implementation, only calling 'super'.
+    const char *types = method_getTypeEncoding(method);
+    class_addMethod(clazz, selector, imp_implementationWithBlock(^(__unsafe_unretained id self, va_list argp) {
+        struct objc_super super = {self, clazz};
+        return ((id(*)(struct objc_super *, SEL, va_list))objc_msgSendSuper2)(&super, selector, argp);
+    }), types);
+
+    // Swizzling.
+    return class_replaceMethod(clazz, selector, newImplementation, types);
+}
 
 // -------------------------------------
-BOOL addMethodThatCallsSuper(
-     Class  _Nonnull __unsafe_unretained cls,
-     SEL _Nonnull selector,
-     const char* _Nullable types)
+BOOL addMethodThatCallsSuper_old(
+    Class  _Nonnull __unsafe_unretained cls,
+    SEL _Nonnull selector,
+    const char* _Nullable types)
 {
     return class_addMethod(cls, selector, (IMP)forwardToSuperFromSwizzle, types);
 }
