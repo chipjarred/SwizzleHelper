@@ -27,7 +27,7 @@ let package = Package(
             cSettings:
             [
                 .headerSearchPath("Internal"),
-                .unsafeFlags(["-Onone"]),
+                .unsafeFlags(["-O0"]),
             ]
         ),
         .testTarget(
