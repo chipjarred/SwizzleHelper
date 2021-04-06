@@ -32,7 +32,7 @@ fileprivate var implementationMap: [IMPMapKey: IMP] = [:]
 
 // MARK:- NSObject extension
 // -------------------------------------
-extension NSObject
+public extension NSObject
 {
     // -------------------------------------
     /**
@@ -80,7 +80,8 @@ extension NSObject
     
     // -------------------------------------
     /**
-     Replaces the implementation of the method specified by `Selector` in the receiving `class` with `newImplementation`.
+     Replaces the implementation of the method specified by `Selector` in the
+     receiving `class` with `newImplementation`.
      
      - Note: `IMP` is an Objective-C runtime type.  It is an `OpaquePointer` to
         a C function.
