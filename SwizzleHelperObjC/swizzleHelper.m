@@ -17,16 +17,6 @@ OBJC_EXPORT id objc_msgSendSuper2(struct objc_super *super, SEL op, ...);
  All of the callIMP_... functions are implemented in Objective-C instead of
  Swift because I could not get Swift to properly cast them `IMP` to the correct
  type of function, resulting in crashing when calling them.
- 
- The same is true for forwardToSuperFromSwizzle, but it had the additional
- problem that when making the objc_super structure, the Swift *compiler* would
- crash trying to assign its `receiver` member field, which translates to Swift
- as an Unmanaged<AnyObject>.  That seems to have been a problem in a @_cdecl
- context.
-
- In addition the call to objc_msgSendSuper in forwardToSuperFromSwizzle can't
- be done at all in Swift, because it's simply not available... at all.  The
- only way to call it is from Objective-C.
  */
 
 // -------------------------------------
@@ -65,6 +55,7 @@ void callIMP_withPointer(
     ((funcPtr)imp)(receiver, selector, param);
 }
 
+// -------------------------------------
 BOOL addMethodThatCallsSuper(
     Class  _Nonnull __unsafe_unretained cls,
     SEL _Nonnull selector,
