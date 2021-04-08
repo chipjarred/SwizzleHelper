@@ -2,7 +2,8 @@ import XCTest
 import SwizzleHelper
 import ObjectiveC
 
-final class SwizzleHelperTests: XCTestCase
+// -------------------------------------
+final class Swizzling_Tests: XCTestCase
 {
     // -------------------------------------
     func test_swizzled_method_is_called()
