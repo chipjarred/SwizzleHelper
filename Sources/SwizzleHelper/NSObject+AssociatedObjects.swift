@@ -31,29 +31,29 @@ public extension NSObject
      Subclass.associatedValues["protozoa"] = "amoeba"
      
      // prints "dog"
-     print("\(BaseClass.associatedValues["animal"] ?? "nil")")
+     print("\(BaseClass.associatedValues["animal"] as? String  ?? "nil")")
      
      // prints "hibiscus"
-     print("\(BaseClass.associatedValues["plant"] ?? "nil")")
+     print("\(BaseClass.associatedValues["plant"] as? String  ?? "nil")")
      
      // prints "nil"
-     print("\(BaseClass.associatedValues["protozoa"] ?? "nil")")
+     print("\(BaseClass.associatedValues["protozoa"] as? String  ?? "nil")")
      
      // prints "cat"
-     print("\(Subclass.associatedValues["animal"] ?? "nil")")
+     print("\(Subclass.associatedValues["animal"] as? String  ?? "nil")")
      
      // prints "nil"
-     print("\(Subclass.associatedValues["plant"] ?? "nil")")
+     print("\(Subclass.associatedValues["plant"] as? String  ?? "nil")")
      
      // prints "amoeba"
-     print("\(Subclass.associatedValues["protozoa"] ?? "nil")")
+     print("\(Subclass.associatedValues["protozoa"] as? String  ?? "nil")")
      
      let object = Subclass()
      
      // All of these print "nil"
-     print("\(object.associatedValues["animal"] ?? "nil")")
-     print("\(object.associatedValues["plant"] ?? "nil")")
-     print("\(object.associatedValues["protozoa"] ?? "nil")")
+     print("\(object.associatedValues["animal"] as? String  ?? "nil")")
+     print("\(object.associatedValues["plant"] as? String ?? "nil")")
+     print("\(object.associatedValues["protozoa"] as? String  ?? "nil")")
      ```
      */
     static var associatedValues: AssociatedValues
