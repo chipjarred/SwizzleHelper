@@ -1,35 +1,6 @@
 import AppKit
 @_exported import SwizzleHelperObjC
 
-// -------------------------------------
-/**
- Data structure to use a `Dictionary.Key` for mapping a class and swizzled
- selector to its previous implementation
- */
-fileprivate struct IMPMapKey: Hashable
-{
-    let classType: AnyClass
-    let selector: Selector
-    
-    static func == (left: Self, right: Self) -> Bool
-    {
-        return left.classType == right.classType
-            && left.selector == right.selector
-    }
-    
-    func hash(into hasher: inout Hasher)
-    {
-        hasher.combine(classType.description())
-        hasher.combine(selector)
-    }
-}
-
-/**
- `Dictionary` mapping class-selector combinations to their corresponding
- previous implementation.
- */
-fileprivate var implementationMap: [IMPMapKey: IMP] = [:]
-
 // MARK:- NSObject extension
 // -------------------------------------
 public extension NSObject
@@ -39,10 +10,8 @@ public extension NSObject
      Get the previous implementation for `selector` or `nil` if `selector` has
      no previous implementation (possible it wasn't swizzled).
      */
-    static func implementation(for selector: Selector) -> IMP?
-    {
-        let key = IMPMapKey(classType: Self.self, selector: selector)
-        return implementationMap[key]
+    static func implementation(for selector: Selector) -> IMP? {
+        return Self.associatedValues[selector.description] as? IMP
     }
     
     // MARK:- Swizzled method forwarding
@@ -126,8 +95,7 @@ public extension NSObject
             selector: oldSelector,
             newImplementation: newImp)
         {
-            let key = IMPMapKey(classType: Self.self, selector: oldSelector)
-            implementationMap[key] = oldImp
+            Self.associatedValues[oldSelector.description] = oldImp
         }
     }
     
