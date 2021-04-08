@@ -19,7 +19,7 @@ Associated values are values you can associate wtih a particular subclass of `NS
 You do this through the `associatedValues` instance property:
 
 ```swift
-extension MyView: NSView
+extension MyView
 {
     var shouldBlurContents: Bool
     {
