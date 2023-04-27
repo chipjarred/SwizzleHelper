@@ -172,7 +172,7 @@ final class Swizzling_Tests: XCTestCase
         
         let swizzled = Swizzled { result += $0 }
         let foo = swizzled.perform(#selector(getter: Swizzled.foo))!
-            .takeUnretainedValue() as! NSString
+            .takeUnretainedValue() as! String
         
         XCTAssertEqual(result, "Swizzled")
         XCTAssertEqual(foo, "Unswizzled")
