@@ -32,6 +32,25 @@ public extension NSObject
     
     // -------------------------------------
     /**
+     Call the old implementation that takes no parameters and returns an
+        `NSObject?`, if it exists for a `selector` that has been replaced by
+        swizzling.
+     
+     - Parameter selector: The `selector` whose previous implementation is to
+        be called
+     - Returns: The `NSObject?` returned by the original implementation of
+        `selector`.
+     */
+    func callReplacedMethodReturningObject(for selector: Selector) -> NSObject?
+    {
+        if let imp = Self.implementation(for: selector) {
+            return callIMP_returningObject(imp, self, selector)
+        }
+        return nil
+    }
+    
+    // -------------------------------------
+    /**
      Call the old implementation that takes an `NSObject` parameter, if it
      exists for a `selector` that has been replaced by swizzling.
      
@@ -39,7 +58,7 @@ public extension NSObject
         - selector: The `selector` whose previous implementation is to be called
         - event: The `NSObject` to be forwarded to the previous implementation.
      */
-    func callReplacedEventMethod(
+    func callReplacedObjectMethod(
         for selector: Selector,
         with object: NSObject)
     {
@@ -61,16 +80,30 @@ public extension NSObject
         for selector: Selector,
         with event: NSEvent)
     {
-        if let imp = Self.implementation(for: selector) {
-            callIMP_withObject(imp, self, selector, event)
-        }
+        callReplacedObjectMethod(for: selector, with: event)
+    }
+    
+    // -------------------------------------
+    /**
+     Call the old implementation that takes an `NSString` parameter, if it
+     exists for a `selector` that has been replaced by swizzling.
+     
+     - Parameters:
+        - selector: The `selector` whose previous implementation is to be called
+        - event: The `NSEvent` to be forwarded to the previous implementation.
+     */
+    func callReplacedStringMethod(
+        for selector: Selector,
+        with string: NSString)
+    {
+        callReplacedObjectMethod(for: selector, with: string)
     }
 
     
     // -------------------------------------
     /**
      Replace the implementation of `oldSelector` with the implementation of
-     `newSelector`.  It's up to the new implemenatoin to forward to the old
+     `newSelector`.  It's up to the new implementation to forward to the old
      one.
      
      If `oldSelector` is not implemented,, it will be added using
@@ -150,7 +183,7 @@ public extension NSObject
     
     // -------------------------------------
     /**
-     Convenience function for obtaining the `METHOD` associated with `seletor` for the receiving class.
+     Convenience function for obtaining the `METHOD` associated with `selector` for the receiving class.
      
      - Parameter selector: The `Selector` whose `METHOD` is to be returned.
      - Returns: A `METHOD` for `selector` when applied to the receiving class,

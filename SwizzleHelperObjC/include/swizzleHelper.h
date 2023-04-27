@@ -35,6 +35,21 @@ void callIMP(
     _Nonnull __unsafe_unretained id receiver,
     _Nonnull SEL selector);
 
+
+// -------------------------------------
+/*!
+ @abstract Call the functoin specified by `imp` passing the `receiver` and
+ `selector`with no other parameters.
+ @param imp the implementation function to be called
+ @param receiver the receiver of the implementatoin call
+ @param selector the selector to be used for the implemenation call.
+ @returns: An NSObject returned from IMP
+ */
+NSObject* _Nullable callIMP_returningObject(
+     IMP _Nonnull imp,
+     _Nonnull __unsafe_unretained id receiver,
+     _Nonnull SEL selector);
+
 // -------------------------------------
 /*!
  @abstract Call the functoin specified by `imp` passing the `receiver`,

@@ -30,6 +30,17 @@ void callIMP(
 }
 
 // -------------------------------------
+NSObject* _Nullable callIMP_returningObject(
+     IMP _Nonnull imp,
+     _Nonnull __unsafe_unretained id receiver,
+     _Nonnull SEL selector)
+{
+    typedef NSObject* (*funcPtr)(__unsafe_unretained id, SEL);
+    NSObject* obj = ((funcPtr)imp)(receiver, selector);
+    return obj;
+}
+
+// -------------------------------------
 void callIMP_withObject(
      IMP _Nonnull imp,
      __unsafe_unretained id _Nonnull receiver,

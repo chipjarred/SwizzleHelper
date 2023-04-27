@@ -139,4 +139,80 @@ final class Swizzling_Tests: XCTestCase
         
         XCTAssertEqual(result, "SwizzledUnswizzled")
     }
+    
+    // -------------------------------------
+    func test_can_swizzle_property_getter()
+    {
+        var result: String = ""
+        
+        class Swizzled: NSObject
+        {
+            let resultSetter: (String) -> Void
+            
+            @objc var foo: String = "Unswizzled"
+            
+            @objc func fooGetterReplacement() -> String
+            {
+                resultSetter("Swizzled")
+                return callReplacedMethodReturningObject(
+                    for: #selector(getter: Swizzled.foo)
+                ) as! String
+            }
+
+            init(_ setter: @escaping (String) -> Void) {
+                self.resultSetter = setter
+            }
+        }
+        
+        
+        Swizzled.replaceMethod(
+            #selector(getter: Swizzled.foo),
+            with: #selector(Swizzled.fooGetterReplacement)
+        )
+        
+        let swizzled = Swizzled { result += $0 }
+        let foo = swizzled.perform(#selector(getter: Swizzled.foo))!
+            .takeUnretainedValue() as! NSString
+        
+        XCTAssertEqual(result, "Swizzled")
+        XCTAssertEqual(foo, "Unswizzled")
+    }
+    
+    // -------------------------------------
+    func test_can_swizzle_property_setter()
+    {
+        var result: String = ""
+        
+        class Swizzled: NSObject
+        {
+            let resultSetter: (String) -> Void
+            
+            @objc var foo: String = ""
+            
+            @objc func fooSetterReplacement(newValue: String)
+            {
+                resultSetter("Swizzled")
+                callReplacedStringMethod(
+                    for: #selector(setter: Swizzled.foo),
+                    with: newValue as NSString
+                )
+            }
+
+            init(_ setter: @escaping (String) -> Void) {
+                self.resultSetter = setter
+            }
+        }
+        
+        
+        Swizzled.replaceMethod(
+            #selector(setter: Swizzled.foo),
+            with: #selector(Swizzled.fooSetterReplacement)
+        )
+        
+        let swizzled = Swizzled { result += $0 }
+        swizzled.perform(#selector(setter: Swizzled.foo), with: "Unswizzled")
+        
+        XCTAssertEqual(result, "Swizzled")
+        XCTAssertEqual(swizzled.foo, "Unswizzled")
+    }
 }
