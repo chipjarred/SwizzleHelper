@@ -215,4 +215,40 @@ final class Swizzling_Tests: XCTestCase
         XCTAssertEqual(result, "Swizzled")
         XCTAssertEqual(swizzled.foo, "Unswizzled")
     }
+    
+    // -------------------------------------
+    func test_can_swizzle_method_that_takes_closure_which_takes_Any_paarameter()
+    {
+        class Swizzled: NSObject
+        {
+            static var result: String = "Unswizzled"
+            
+            @objc func foo (_ f: @escaping @convention(block) (Any) -> Void)
+            {
+                f("Foo called")
+            }
+            
+            @objc func newFoo(_ f: @escaping @convention(block) (Any) -> Void)
+            {
+                Self.result = "Swizzled"
+                callReplacedClosureMethod(
+                    for : #selector(Swizzled.foo(_:)),
+                    with: f
+                )
+            }
+        }
+        
+        Swizzled.replaceMethod(
+            #selector(Swizzled.foo(_:)),
+            with: #selector(Swizzled.newFoo(_:))
+        )
+        
+        let swizzled = Swizzled()
+        let closure: @convention(block) (Any) -> Void = { (_ param: Any) in
+            Swizzled.result += (param as? String) ?? "**Nil**"
+        }
+        swizzled.perform(#selector(Swizzled.foo(_:)), with: closure)
+        
+        XCTAssertEqual(Swizzled.result, "SwizzledFoo called")
+    }
 }

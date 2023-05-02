@@ -99,7 +99,26 @@ public extension NSObject
         callReplacedObjectMethod(for: selector, with: string)
     }
 
+    // -------------------------------------
+    /**
+     Call the old implementation that takes an `NSObject` parameter, if it
+     exists for a `selector` that has been replaced by swizzling.
+     
+     - Parameters:
+        - selector: The `selector` whose previous implementation is to be called
+        - closure: closure taking  asingle `Any` parameter  to be passed to
+            the previous implementation ..
+     */
+    func callReplacedClosureMethod(
+        for selector: Selector,
+        with closure: @escaping (Any) -> Void)
+    {
+        if let imp = Self.implementation(for: selector) {
+            callIMP_withClosure(imp, self, selector, closure)
+        }
+    }
     
+
     // -------------------------------------
     /**
      Replace the implementation of `oldSelector` with the implementation of

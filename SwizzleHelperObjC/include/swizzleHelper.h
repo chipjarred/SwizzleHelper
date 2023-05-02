@@ -80,5 +80,20 @@ void callIMP_withPointer(
     _Nonnull SEL selector,
     const void * _Nullable param);
 
+// -------------------------------------
+/*!
+ @abstract Call the functoin specified by `imp` passing the `receiver`,
+ `selector`, and a void pointer
+ @param imp the implementation function to be called
+ @param receiver the receiver of the implementatoin call
+ @param selector the selector to be used for the implemenation call.
+ @param param An Objective-C block to be passed as the parameter.
+ */
+void callIMP_withClosure(
+    IMP _Nonnull imp,
+    __unsafe_unretained id _Nonnull receiver,
+    _Nonnull SEL selector,
+    void (^ _Nonnull param)(id _Nonnull));
+
 
 #endif /* swizzleHelper_h */

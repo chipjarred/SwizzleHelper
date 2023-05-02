@@ -67,6 +67,26 @@ void callIMP_withPointer(
 }
 
 // -------------------------------------
+/*!
+ @abstract Call the functoin specified by `imp` passing the `receiver`,
+ `selector`, and a void pointer
+ @param imp the implementation function to be called
+ @param receiver the receiver of the implementatoin call
+ @param selector the selector to be used for the implemenation call.
+ @param param An Objective-C block to be passed as the parameter.
+ */
+void callIMP_withClosure(
+    IMP _Nonnull imp,
+    __unsafe_unretained id _Nonnull receiver,
+    _Nonnull SEL selector,
+    void (^param)(id _Nonnull))
+{
+    typedef void (*funcPtr)(__unsafe_unretained id, SEL, id param);
+    ((funcPtr)imp)(receiver, selector, param);
+}
+
+
+// -------------------------------------
 BOOL addMethodThatCallsSuper(
     Class  _Nonnull __unsafe_unretained cls,
     SEL _Nonnull selector,
